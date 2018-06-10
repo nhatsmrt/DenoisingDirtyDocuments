@@ -24,7 +24,7 @@ image_height = 540
 mini_img_width = 30
 mini_img_height = 30
 
-num_epoch = 1
+num_epoch = 20
 thres = 0.25
 
 
