@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 import copy
 
 def deflatten(images, inp_w = 32, inp_h = 32):
@@ -45,4 +46,23 @@ def threshold_v2(images, threshold):
 
     return img_copy
 
+def threshold_v3(images, lower = 0, upper = 1):
+    img_copy = copy.deepcopy(images)
+    for ind in range(len(img_copy)):
+        img_copy[ind][np.where(img_copy[ind] > upper)] = 1
+        img_copy[ind][np.where(img_copy[ind] < lower)] = 0
 
+    return img_copy
+
+
+def write_results(images, file_indices, sample_path, result_path):
+    df = pd.read_csv(sample_path)
+    for ind in range(len(images)):
+        for r in range(images[ind].shape[0]):
+            for c in range(images[ind].shape[1]):
+                id = str(file_indices[ind]) + "_" + str(r + 1) + "_" + str(c + 1)
+                value = images[ind][r][c]
+                df.loc[df['id'] == id, 'value'] = value
+                print(df.loc[df['id'] == id, 'value'])
+
+    df.to_csv(result_path, sep=',', encoding='utf-8', index=False)

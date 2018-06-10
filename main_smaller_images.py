@@ -4,7 +4,7 @@ import cv2
 import os
 
 from Source import DenoisingNet, MiniDenoisingNet, LinearRegressor,\
-    deflatten, threshold, threshold_v2, crop, reconstruct
+    deflatten, threshold, threshold_v2, crop, reconstruct, write_results
 from sklearn.linear_model import LinearRegression
 
 path = Path()
@@ -13,6 +13,8 @@ train_images_path = str(d) + "/Data/train/"
 train_images_cleaned_path = str(d) + "/Data/train_cleaned/"
 test_path = str(d) + "/Data/test/"
 predictions_path = str(d) + "/Predictions/"
+sample_path = predictions_path + "sampleSubmission.csv"
+demo_path = predictions_path + "demo.csv"
 
 
 X_train = []
@@ -25,7 +27,7 @@ mini_img_width = 30
 mini_img_height = 30
 
 num_epoch = 20
-thres = 0.25
+thres = 0.75
 
 
 for filename in os.listdir(train_images_path):
@@ -42,18 +44,21 @@ for filename in os.listdir(train_images_path):
     crop(img, X_train)
 
 
-for filename in os.listdir(train_images_cleaned_path):
-    image_path = train_images_cleaned_path + filename
-    img = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE) / 255
-    if img.shape[0] < 420:
-        n_pad = 6
-        img = np.pad(img, pad_width = ((n_pad, n_pad), (0, 0)), mode = 'constant', constant_values = (((0, 0), (0, 0))))
+    image_path_y = train_images_cleaned_path + filename
+    img_y = cv2.imread(image_path_y, cv2.IMREAD_GRAYSCALE) / 255
 
-    crop(img, y_train)
+    if img_y.shape[0] < 420:
+        n_pad = 6
+        img_y = np.pad(img_y, pad_width = ((n_pad, n_pad), (0, 0)), mode = 'constant', constant_values = (((0, 0), (0, 0))))
+
+    crop(img_y, y_train)
 
 reconstruct_indices = []
+file_indices = []
 
 for filename in os.listdir(test_path):
+    ind = str(filename[:-4])
+    file_indices.append(ind)
     image_path = test_path + filename
     img = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE) / 255
     if img.shape[0] < 420:
@@ -81,9 +86,12 @@ predictions_reconstructed = reconstruct(predictions.reshape(-1, 30, 30), reconst
 predictions_thresholded = threshold_v2(predictions_reconstructed, threshold = thres)
 X_test_reconstructed = reconstruct(X_test.reshape(-1, 30, 30), reconstruct_indices)
 
+# demo_images = threshold_v2(X_test_reconstructed, threshold = 0.7)
+# write_results(demo_images, file_indices = file_indices, sample_path = sample_path, result_path = demo_path)
+
 for ind in range(len(predictions_reconstructed)):
-    cv2.imwrite(predictions_path + "_predicted_" + str(ind) + ".png", predictions_reconstructed[ind] * 255)
-    cv2.imwrite(predictions_path + "_original_" + str(ind) + ".png", X_test_reconstructed[ind] * 255)
-    cv2.imwrite(predictions_path + "_thresholded_" + str(ind) + ".png", predictions_thresholded[ind] * 255)
+    cv2.imwrite(predictions_path + "_predicted_" + str(file_indices[ind]) + ".png", predictions_reconstructed[ind] * 255)
+    cv2.imwrite(predictions_path + "_original_" + str(file_indices[ind]) + ".png", X_test_reconstructed[ind] * 255)
+    cv2.imwrite(predictions_path + "_thresholded_" + str(file_indices[ind]) + ".png", predictions_thresholded[ind] * 255)
 
 
