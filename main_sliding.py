@@ -30,7 +30,7 @@ mini_img_width = 64
 mini_img_height = 64
 stride = 16
 
-num_epoch = 1
+num_epoch = 10
 thres = 0.75
 
 
@@ -71,7 +71,7 @@ X_test = np.array(X_test).reshape(-1, mini_img_width, mini_img_height, 1)
 
 
 model = MiniDenoisingNet(inp_w = mini_img_width, inp_h = mini_img_height)
-model.fit(X_train, y_train_flat, num_epoch = num_epoch, weight_save_path = weight_save_path)
+model.fit(X_train, y_train_flat, num_epoch = num_epoch, weight_save_path = weight_save_path, print_every = 100)
 
 predictions = model.predict(X_test)
 predictions_reconstructed = reconstruct_sliding(predictions.reshape(-1, mini_img_width, mini_img_height),
@@ -84,8 +84,6 @@ X_test_reconstructed = reconstruct_sliding(X_test.reshape(-1, mini_img_width, mi
                                            ind_list = sub_ind,
                                            n_subimages = n_subimages)
 print("Finish reconstructing")
-# demo_images = threshold_v2(X_test_reconstructed, threshold = 0.7)
-# write_results(demo_images, file_indices = file_indices, sample_path = sample_path, result_path = demo_path)
 
 for ind in range(len(predictions_reconstructed)):
     cv2.imwrite(predictions_path + "_slided_predicted_" + str(file_indices[ind]) + ".png", predictions_reconstructed[ind] * 255)

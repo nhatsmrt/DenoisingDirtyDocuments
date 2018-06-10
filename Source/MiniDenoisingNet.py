@@ -37,13 +37,6 @@ class MiniDenoisingNet:
 
         self._re = tf.reshape(self._conv_module_2, shape = [-1, 676])
 
-        # self._X_flat = tf.reshape(self._X,  shape = [-1, inp_w * inp_h])
-        # self._W = tf.get_variable(name = "W", shape = [inp_w * inp_h, 100],
-        #                          initializer=tf.keras.initializers.he_normal())
-        # self._b = tf.get_variable(name = "b", shape = [100])
-        # self._re = tf.nn.relu(tf.matmul(self._X_flat, self._W) + self._b)
-        # self._re_norm = tf.layers.batch_normalization(self._re, training=self._is_training)
-
 
         self._W_decode = tf.get_variable(name = "W_decode", shape = [676, inp_w * inp_h],
                                  initializer=tf.keras.initializers.he_normal())
@@ -265,7 +258,7 @@ class MiniDenoisingNet:
 
     # Train:
     def fit(self, X, y, num_epoch = 1, batch_size = 16, weight_save_path=None, weight_load_path=None,
-            plot_losses=False):
+            plot_losses=False, print_every = 1):
         self._y = tf.placeholder(tf.float32, shape=[None, self._w * self._h])
         # self._mean_loss = tf.reduce_mean(tf.square(self._y - self._op))
         # self._mean_loss = -tf.reduce_mean(self._y * tf.log(self._op) + (1 - self._y) * tf.log(1 - self._op))
@@ -283,7 +276,7 @@ class MiniDenoisingNet:
             self._sess.run(tf.global_variables_initializer())
         if num_epoch > 0:
             print('Training Denoising Net for ' + str(num_epoch) + ' epochs')
-            self.run_model(self._sess, self._op, self._mean_loss, X, y, num_epoch, batch_size, 1,
+            self.run_model(self._sess, self._op, self._mean_loss, X, y, num_epoch, batch_size, print_every,
                            self._train_step, weight_save_path=weight_save_path, plot_losses=plot_losses)
 
     def create_pad(self, n, pad):

@@ -42,7 +42,6 @@ def slide(image, store, mini_width, mini_height, strides = 16, reconstructed = F
     if reconstructed:
         return n_image, position
 
-
 def reconstruct(images, indices_list, mini_width = 30, mini_height = 30):
     done = 0
     reconstructed_images = []
