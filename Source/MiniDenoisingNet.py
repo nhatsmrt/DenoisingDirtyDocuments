@@ -33,7 +33,9 @@ class MiniDenoisingNet:
         # Create network:
 
         self._conv_module_1 = self.convolutional_module_with_max_pool(x = self._X_norm, inp_channel = 1, op_channel = 2, name = "module_1", strides = 1)
-        self._re = tf.reshape(self._conv_module_1, shape = [-1, 338])
+        self._conv_module_2 = self.convolutional_module_with_max_pool(x = self._conv_module_1, inp_channel = 2, op_channel = 4, name = "module_2", strides = 1)
+
+        self._re = tf.reshape(self._conv_module_2, shape = [-1, 676])
 
         # self._X_flat = tf.reshape(self._X,  shape = [-1, inp_w * inp_h])
         # self._W = tf.get_variable(name = "W", shape = [inp_w * inp_h, 100],
@@ -43,7 +45,7 @@ class MiniDenoisingNet:
         # self._re_norm = tf.layers.batch_normalization(self._re, training=self._is_training)
 
 
-        self._W_decode = tf.get_variable(name = "W_decode", shape = [338, inp_w * inp_h],
+        self._W_decode = tf.get_variable(name = "W_decode", shape = [676, inp_w * inp_h],
                                  initializer=tf.keras.initializers.he_normal())
         self._b_decode = tf.get_variable(name = "b_decode", shape = [inp_w * inp_h])
         self._X_reconstructed = tf.matmul(self._re, self._W_decode) + self._b_decode
