@@ -18,6 +18,7 @@ predictions_path = str(d) + "/Predictions/"
 sample_path = predictions_path + "sampleSubmission.csv"
 demo_path = predictions_path + "demo.csv"
 weight_save_path = str(d) + "/weights/model.ckpt"
+weight_load_path = str(d) + "/weights/2/model.ckpt"
 
 
 X_train = []
@@ -65,13 +66,15 @@ for filename in os.listdir(test_path):
 print("Finish Sliding")
 
 X_train = np.array(X_train).reshape(-1, mini_img_width, mini_img_height, 1)
-y_train = np.array(y_train).reshape(-1, mini_img_width, mini_img_height, 1)
-y_train_flat = y_train.reshape(y_train.shape[0], -1)
+y_train = np.array(y_train).reshape(-1, mini_img_width * mini_img_height)
 X_test = np.array(X_test).reshape(-1, mini_img_width, mini_img_height, 1)
 
 
+
 model = MiniDenoisingNet(inp_w = mini_img_width, inp_h = mini_img_height)
-model.fit(X_train, y_train_flat, num_epoch = num_epoch, weight_save_path = weight_save_path, print_every = 100)
+model.fit(X_train, y_train, num_epoch = num_epoch,
+          weight_load_path = weight_load_path,
+          weight_save_path = weight_save_path, print_every = 100)
 
 predictions = model.predict(X_test)
 predictions_reconstructed = reconstruct_sliding(predictions.reshape(-1, mini_img_width, mini_img_height),
@@ -83,6 +86,7 @@ X_test_reconstructed = reconstruct_sliding(X_test.reshape(-1, mini_img_width, mi
                                            image_sizes = image_sizes,
                                            ind_list = sub_ind,
                                            n_subimages = n_subimages)
+
 print("Finish reconstructing")
 
 for ind in range(len(predictions_reconstructed)):

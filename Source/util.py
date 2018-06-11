@@ -27,16 +27,21 @@ def slide(image, store, mini_width, mini_height, strides = 16, reconstructed = F
             # print(image[r : r + mini_width, c : c + mini_height].shape)
 
     if (image.shape[0] -  mini_width) % strides != 0:
-        for c in range(0, image.shape[1] - mini_height + 1):
+        for c in range(0, image.shape[1] - mini_height + 1, strides):
             store.append(image[image.shape[0] -  mini_width : image.shape[0], c : c + mini_height])
             position.append([image.shape[0] -  mini_width, c])
             n_image += 1
 
     if (image.shape[1] -  mini_height) % strides != 0:
-        for r in range(0, image.shape[0] - mini_width + 1):
+        for r in range(0, image.shape[0] - mini_width + 1, strides):
             store.append(image[r : r + mini_width, image.shape[1] -  mini_height : image.shape[1]])
             position.append([r, image.shape[1] -  mini_height])
             n_image += 1
+
+    if (image.shape[0] - mini_width) % strides != 0 and (image.shape[1] -  mini_height) % strides != 0:
+        store.append(image[image.shape[0] -  mini_width: image.shape[0], image.shape[1] - mini_height: image.shape[1]])
+        position.append([image.shape[0] -  mini_width, image.shape[1] - mini_height])
+        n_image += 1
 
 
     if reconstructed:
