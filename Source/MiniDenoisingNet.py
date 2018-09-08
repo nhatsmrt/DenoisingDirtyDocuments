@@ -28,8 +28,7 @@ class MiniDenoisingNet:
         self._is_training = tf.placeholder(tf.bool)
         self._keep_prob_tensor = tf.placeholder(tf.float32)
         self._X_norm = tf.layers.batch_normalization(self._X, training=self._is_training)
-        self._batch_size = tf.shape(self._X_norm
-                                    )[0]
+        self._batch_size = tf.placeholder(shape = [], dtype = tf.int32)
 
         # Create network:
 
@@ -111,8 +110,8 @@ class MiniDenoisingNet:
         filter = tf.get_variable("filter" + name, shape=[kernel_size, kernel_size, op_shape[3], inp_shape[3]])
         z_deconv = tf.nn.conv2d_transpose(x, filter=filter, strides=[1, strides, strides, 1], padding=padding,
                                           output_shape=tf.stack(op_shape)) + b_deconv
-        # a_deconv = tf.nn.relu(z_deconv)
-        # h_conv = tf.layers.batch_normalization(a_conv, axis = 1, training = self._is_training)
+        a_deconv = tf.nn.relu(z_deconv)
+        h_conv = tf.layers.batch_normalization(a_deconv, training = self._is_training, renorm = True)
         return z_deconv
 
 
@@ -287,10 +286,28 @@ class MiniDenoisingNet:
         return tf.reduce_mean(x, axis=[1, 2])
 
     # Predict:
-    def predict(self, X):
-        ans = self._sess.run(self._op,
-                             feed_dict={self._X: X, self._is_training: False, self._keep_prob_tensor: 1.0})
-        return ans
+    def predict(self, X, batch_size = None):
+        if batch_size is None:
+            batch_size = X.shape[0]
+        train_indicies = np.arange(X.shape[0])
+        predictions = np.zeros(shape = [X.shape[0], self._w * self._h])
+        for i in range(int(math.ceil(X.shape[0] / batch_size))):
+            # generate indicies for the batch
+            start_idx = (i * batch_size) % X.shape[0]
+            idx = train_indicies[start_idx:start_idx + batch_size]
+
+            # create a feed dictionary for this batch
+            # get batch size
+            actual_batch_size = X[idx, :].shape[0]
+
+            op = self._sess.run(self._op, feed_dict={
+                self._X: X[idx, :],
+                self._batch_size: actual_batch_size,
+                self._is_training: False,
+                self._keep_prob_tensor: 1.0})
+            predictions[idx, :] = op
+
+        return predictions
 
 
     # Train:
@@ -366,6 +383,7 @@ class MiniDenoisingNet:
                     feed_dict = {self._X: Xd[idx, :],
                                  self._y: yd[idx],
                                  self._is_training: training_now,
+                                 self._batch_size: actual_batch_size,
                                  self._keep_prob_tensor: self._keep_prob_passed}
                     # have tensorflow compute loss and correct predictions
                     # and (if given) perform a training step
@@ -386,6 +404,7 @@ class MiniDenoisingNet:
                     feed_dict = {self._X: Xd[idx, :],
                                  self._y: yd[idx],
                                  self._is_training: False,
+                                 self._batch_size: actual_batch_size,
                                  self._keep_prob_tensor: 1.0}
                     psnr_tensor = self.psnr(self._mean_loss)
                     val_loss, psnr = session.run([self._mean_loss, psnr_tensor], feed_dict=feed_dict)

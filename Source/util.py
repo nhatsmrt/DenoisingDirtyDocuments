@@ -106,6 +106,7 @@ def threshold_v3(images, lower = 0, upper = 1):
     return img_copy
 
 
+
 def write_results(images, file_indices, sample_path, result_path):
     df = pd.read_csv(sample_path)
     for ind in range(len(images)):
@@ -117,3 +118,11 @@ def write_results(images, file_indices, sample_path, result_path):
                 print(df.loc[df['id'] == id, 'value'])
 
     df.to_csv(result_path, sep=',', encoding='utf-8', index=False)
+
+def write_info(write_info_path, mean, std):
+    f = open(write_info_path, mode='w')
+    f.write("Mean: \n")
+    f.write(str(mean) + "\n")
+    f.write("STD: \n")
+    f.write(str(std) + "\n")
+    f.close()
