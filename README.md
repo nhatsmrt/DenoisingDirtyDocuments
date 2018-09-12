@@ -8,6 +8,7 @@ Small windows (e.g ![equation](http://latex.codecogs.com/gif.latex?32%20%5Ctimes
 Before:
 
 ![Before](https://github.com/nhatsmrt/DenoisingDirtyDocuments/blob/sliding/Predictions/_slided_original_136.png)
+
 After:
 
 ![Before](https://github.com/nhatsmrt/DenoisingDirtyDocuments/blob/sliding/Predictions/_slided_predicted_136.png)
