@@ -3,11 +3,11 @@ from pathlib import Path
 import cv2
 import os
 
-from Source import DenoisingNet, MiniDenoisingNet, LinearRegressor,\
+from Source import DenoisingNet, MiniDenoisingNet, DeconvDenoisingNet, InterpolatingDenoisingNet, \
     deflatten, threshold, threshold_v2,\
     crop, slide,\
     reconstruct, reconstruct_sliding,\
-    write_results
+    write_results, write_info
 
 path = Path()
 d = path.resolve()
@@ -17,8 +17,10 @@ test_path = str(d) + "/Data/test/"
 predictions_path = str(d) + "/Predictions/"
 sample_path = predictions_path + "sampleSubmission.csv"
 demo_path = predictions_path + "demo.csv"
-weight_save_path = str(d) + "/weights/model.ckpt"
-weight_load_path = str(d) + "/weights/2/model.ckpt"
+weight_save_path = str(d) + "/weights/model_deconv.ckpt"
+mean_path = str(d) + "/mean.npy"
+std_path = str(d) + "/std.npy"
+weight_load_path = str(d) + "/weights/14/model_deconv.ckpt"
 
 
 X_train = []
@@ -27,11 +29,11 @@ X_test = []
 
 image_width = 420
 image_height = 540
-mini_img_width = 64
-mini_img_height = 64
+mini_img_width = 32
+mini_img_height = 32
 stride = 16
 
-num_epoch = 10
+num_epoch = 0
 thres = 0.75
 
 
@@ -69,23 +71,42 @@ X_train = np.array(X_train).reshape(-1, mini_img_width, mini_img_height, 1)
 y_train = np.array(y_train).reshape(-1, mini_img_width * mini_img_height)
 X_test = np.array(X_test).reshape(-1, mini_img_width, mini_img_height, 1)
 
+# Zero-center the data:
+mean = np.mean(X_train, axis = 0)
+X_train = X_train - mean
+X_test = X_test - mean
 
+# Standardize the data:
+std = np.std(X_train, axis = 0)
+X_train = X_train / std
+X_test = X_test / std
 
-model = MiniDenoisingNet(inp_w = mini_img_width, inp_h = mini_img_height)
+np.save(mean_path, mean)
+np.save(std_path, std)
+
+model = DeconvDenoisingNet(inp_w = mini_img_width, inp_h = mini_img_height)
 model.fit(X_train, y_train, num_epoch = num_epoch,
           weight_load_path = weight_load_path,
-          weight_save_path = weight_save_path, print_every = 100)
+          weight_save_path = weight_save_path, print_every = 100
+          )
 
 predictions = model.predict(X_test)
 predictions_reconstructed = reconstruct_sliding(predictions.reshape(-1, mini_img_width, mini_img_height),
                                            image_sizes = image_sizes,
                                            ind_list = sub_ind,
-                                           n_subimages = n_subimages)
+                                           n_subimages = n_subimages,
+                                           mini_width = mini_img_width,
+                                           mini_height = mini_img_height)
+
 predictions_thresholded = threshold_v2(predictions_reconstructed, threshold = thres)
+
+X_test = X_test * std + mean
 X_test_reconstructed = reconstruct_sliding(X_test.reshape(-1, mini_img_width, mini_img_height),
                                            image_sizes = image_sizes,
                                            ind_list = sub_ind,
-                                           n_subimages = n_subimages)
+                                           n_subimages = n_subimages,
+                                           mini_width = mini_img_width,
+                                           mini_height = mini_img_height)
 
 print("Finish reconstructing")
 
@@ -93,5 +114,5 @@ for ind in range(len(predictions_reconstructed)):
     cv2.imwrite(predictions_path + "_slided_predicted_" + str(file_indices[ind]) + ".png", predictions_reconstructed[ind] * 255)
     cv2.imwrite(predictions_path + "_slided_original_" + str(file_indices[ind]) + ".png", X_test_reconstructed[ind] * 255)
     cv2.imwrite(predictions_path + "_slided_thresholded_" + str(file_indices[ind]) + ".png", predictions_thresholded[ind] * 255)
-
-
+#
+#
