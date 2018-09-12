@@ -10,7 +10,7 @@ from sklearn.linear_model import LinearRegression
 path = Path()
 d = path.resolve()
 predictions_path = str(d) + "/Predictions/"
-predicted_path = predictions_path + "_predicted_"
+predicted_path = predictions_path + "_slided_predicted_"
 
 test_path = str(d) + "/Data/test/"
 
@@ -39,8 +39,8 @@ for ind in range(len(images)):
     ret, th = cv2.threshold(images[ind], 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
     th2 = cv2.adaptiveThreshold(images[ind], 255, cv2.ADAPTIVE_THRESH_MEAN_C,
                                 cv2.THRESH_BINARY, 11, 2)
-    cv2.imwrite(predictions_path + "_otsu" + str(img_ind[ind]) + ".png", th)
-    cv2.imwrite(predictions_path + "_adaptiveGaussian" + str(img_ind[ind]) + ".png", th2)
+    cv2.imwrite(predictions_path + "_slided_otsu" + str(img_ind[ind]) + ".png", th)
+    # cv2.imwrite(predictions_path + "_adaptiveGaussian" + str(img_ind[ind]) + ".png", th2)
 
 
 # for ind in range(len(images_thresholded)):

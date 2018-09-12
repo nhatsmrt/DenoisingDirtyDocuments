@@ -16,6 +16,37 @@ def crop(image, store, mini_width = 30, mini_height = 30):
             # np.append(store, mini_image, axis = 0)
             store.append(mini_image)
 
+def slide(image, store, mini_width, mini_height, strides = 16, reconstructed = False):
+    position = []
+    n_image = 0
+    for r in range(0, image.shape[0] -  mini_width + 1,  strides):
+        for c in range(0, image.shape[1] -  mini_height + 1, strides):
+            store.append(image[r : r + mini_width, c : c + mini_height])
+            position.append([r, c])
+            n_image += 1
+            # print(image[r : r + mini_width, c : c + mini_height].shape)
+
+    if (image.shape[0] -  mini_width) % strides != 0:
+        for c in range(0, image.shape[1] - mini_height + 1, strides):
+            store.append(image[image.shape[0] -  mini_width : image.shape[0], c : c + mini_height])
+            position.append([image.shape[0] -  mini_width, c])
+            n_image += 1
+
+    if (image.shape[1] -  mini_height) % strides != 0:
+        for r in range(0, image.shape[0] - mini_width + 1, strides):
+            store.append(image[r : r + mini_width, image.shape[1] -  mini_height : image.shape[1]])
+            position.append([r, image.shape[1] -  mini_height])
+            n_image += 1
+
+    if (image.shape[0] - mini_width) % strides != 0 and (image.shape[1] -  mini_height) % strides != 0:
+        store.append(image[image.shape[0] -  mini_width: image.shape[0], image.shape[1] - mini_height: image.shape[1]])
+        position.append([image.shape[0] -  mini_width, image.shape[1] - mini_height])
+        n_image += 1
+
+
+    if reconstructed:
+        return n_image, position
+
 def reconstruct(images, indices_list, mini_width = 30, mini_height = 30):
     done = 0
     reconstructed_images = []
@@ -29,6 +60,26 @@ def reconstruct(images, indices_list, mini_width = 30, mini_height = 30):
             pad_r = (indices[0] * mini_width - indices[2]) // 2
             pad_c = (indices[1] * mini_width - indices[3]) // 2
             reconstructed_image = reconstructed_image[pad_r : indices[0] * mini_width - pad_r, pad_c : indices[1] * mini_height - pad_c]
+        reconstructed_images.append(reconstructed_image)
+    return reconstructed_images
+
+def reconstruct_sliding(images, image_sizes, ind_list,
+                        n_subimages, mini_width = 64, mini_height = 64):
+    done = 0
+    reconstructed_images = []
+    for img_ind in range(len(n_subimages)):
+        reconstructed_image = np.zeros(shape = (image_sizes[img_ind][0], image_sizes[img_ind][1]))
+        mask = np.zeros(shape = (image_sizes[img_ind][0], image_sizes[img_ind][1]))
+        for subimg_ind in range(n_subimages[img_ind]):
+            r = ind_list[img_ind][subimg_ind][0]
+            c = ind_list[img_ind][subimg_ind][1]
+            reconstructed_image[r:r + mini_width, c:c + mini_height] = (reconstructed_image[r : r+mini_width, c : c+mini_height]
+                                                                    * mask[r:r+mini_width, c:c+mini_height]
+                                                                    + images[done]) / (mask[r:r+mini_width, c:c+mini_height] + 1)
+            mask[r:r + mini_width, c:c + mini_height] = mask[r:r+mini_width, c:c+mini_height] + 1
+            done += 1
+
+
         reconstructed_images.append(reconstructed_image)
     return reconstructed_images
 
@@ -55,6 +106,7 @@ def threshold_v3(images, lower = 0, upper = 1):
     return img_copy
 
 
+
 def write_results(images, file_indices, sample_path, result_path):
     df = pd.read_csv(sample_path)
     for ind in range(len(images)):
@@ -66,3 +118,11 @@ def write_results(images, file_indices, sample_path, result_path):
                 print(df.loc[df['id'] == id, 'value'])
 
     df.to_csv(result_path, sep=',', encoding='utf-8', index=False)
+
+def write_info(write_info_path, mean, std):
+    f = open(write_info_path, mode='w')
+    f.write("Mean: \n")
+    f.write(str(mean) + "\n")
+    f.write("STD: \n")
+    f.write(str(std) + "\n")
+    f.close()
