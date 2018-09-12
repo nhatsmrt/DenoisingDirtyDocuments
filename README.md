@@ -7,7 +7,7 @@ Small windows (e.g ![equation](http://latex.codecogs.com/gif.latex?32%20%5Ctimes
 ## Some demo (from competition's test files):
 Before:
 
-![Before](https://github.com/nhatsmrt/DenoisingDirtyDocuments/blob/sliding/Predictions/_slided_original_136.png)![After](https://github.com/nhatsmrt/DenoisingDirtyDocuments/blob/sliding/Predictions/_slided_predicted_136.png)
+![Before](https://github.com/nhatsmrt/DenoisingDirtyDocuments/blob/sliding/Predictions/_slided_original_136.png) 
 
 After:
 
