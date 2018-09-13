@@ -13,26 +13,14 @@ The network has a convolutional encoder with residual connections. For the decod
 Detailed architecture can be found in code and project report.
 ## Some demo (from competition's test files)
 ### Before:
-<br/>
 ![Before](https://github.com/nhatsmrt/DenoisingDirtyDocuments/blob/sliding/Predictions/_slided_original_136.png)
-<br/>
 ### After:
-<br/>
 ![After](https://github.com/nhatsmrt/DenoisingDirtyDocuments/blob/sliding/Predictions/_slided_predicted_136.png)
-<br/>
 ### Before:
-<br/>
 ![Before](https://github.com/nhatsmrt/DenoisingDirtyDocuments/blob/sliding/Predictions/_slided_original_7.png)
-<br/>
 ### After:
-<br/>
 ![After](https://github.com/nhatsmrt/DenoisingDirtyDocuments/blob/sliding/Predictions/_slided_predicted_7.png)
-<br/>
 ### Before:
-<br/>
 ![After](https://github.com/nhatsmrt/DenoisingDirtyDocuments/blob/sliding/Predictions/_slided_original_1.png)
-<br/>
 ### After:
-<br/>
 ![After](https://github.com/nhatsmrt/DenoisingDirtyDocuments/blob/sliding/Predictions/_slided_predicted_1.png)
-<br/>
