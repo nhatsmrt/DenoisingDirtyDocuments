@@ -2,8 +2,6 @@
 ## Author
 Hoang Phan (https://github.com/petrpan26) & Nhat Pham (https://github.com/nhatsmrt)
 ## Introduction
-Author: Nhat Pham, Hoang Phan.
-
 This project is based on Kaggle's competition: https://www.kaggle.com/c/denoising-dirty-documents
 
 The challenge is to removed different types of synthetic noises from scanned texts.
