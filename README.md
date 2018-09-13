@@ -21,6 +21,6 @@ Detailed architecture can be found in code and project report.
 ### After:
 ![After](https://github.com/nhatsmrt/DenoisingDirtyDocuments/blob/sliding/Predictions/_slided_predicted_7.png)
 ### Before:
-![After](https://github.com/nhatsmrt/DenoisingDirtyDocuments/blob/sliding/Predictions/_slided_original_1.png)
+![Before](https://github.com/nhatsmrt/DenoisingDirtyDocuments/blob/master/Predictions/_slided_original_1.png)
 ### After:
-![After](https://github.com/nhatsmrt/DenoisingDirtyDocuments/blob/sliding/Predictions/_slided_predicted_1.png)
+![After](https://github.com/nhatsmrt/DenoisingDirtyDocuments/blob/master/Predictions/_slided_predicted_1.png)
