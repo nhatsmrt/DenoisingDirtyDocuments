@@ -5,6 +5,8 @@ Nhat Pham (https://github.com/nhatsmrt) & Hoang Phan (https://github.com/petrpan
 This project is based on Kaggle's competition: https://www.kaggle.com/c/denoising-dirty-documents
 <br/>
 The challenge is to removed different types of synthetic noises from scanned texts.
+<br/>
+NOTE: This project is writen in Tensorflow 1.9.
 ## Approach
 Small windows (e.g of size ![equation](http://latex.codecogs.com/gif.latex?32%20%5Ctimes%2032)) of the scanned texts are passed through an autoencoder-like neural network.
 <br/>
